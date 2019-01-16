@@ -14,12 +14,15 @@ import net.dv8tion.jda.core.managers.AudioManager;
 import net.dv8tion.jda.core.managers.GuildController;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 class Commands {
 
     private static String punishmentReason = "";
+
+    public static ArrayList<Member> activeTimeouts = new ArrayList<>();
 
     public static class HostInfoCommand extends Command {
 
@@ -168,7 +171,7 @@ class Commands {
                 return;
             }
 
-            for(int i = 1; i < args.length; i++){
+            for (int i = 1; i < args.length; i++) {
                 punishmentReason = (i + 1 < args.length) ? punishmentReason.concat(args[i] + " ") : punishmentReason.concat(args[i]);
             }
 
@@ -190,9 +193,9 @@ class Commands {
 
     }
 
-    public static class RevokeBanCommand extends Command{
+    public static class RevokeBanCommand extends Command {
 
-        RevokeBanCommand(){
+        RevokeBanCommand() {
             this.name = "unban";
             this.aliases = new String[]{"revokeban", "removeban", "uban", "ub"};
             this.help = "ban a user";
@@ -218,7 +221,7 @@ class Commands {
         TempMuteCommand() {
             this.name = "timeout";
             this.aliases = new String[]{"tempmute", "tm"};
-            this.help = "timeout user";
+            this.help = "timeout member";
         }
 
         @Override
@@ -228,7 +231,8 @@ class Commands {
             String[] args = event.getArgs().split(" ");
 
             if (!args[0].matches("<@([!&])?\\d+>")) {
-                event.reply("invalid command");
+                event.reply("Invalid Command");
+                return;
             }
 
             if (event.getMessage().getMentionedMembers().isEmpty()) {
@@ -236,12 +240,12 @@ class Commands {
                 return;
             }
 
-            if (event.getMessage().getContentRaw().matches("^!" + name + " <@\\d+> \\d+$")) {
-                duration = Long.parseLong(event.getArgs().replaceAll("(<@\\d+>)", "").replaceAll("[^\\d+]", ""));
-            } else if (event.getMessage().getContentRaw().matches("^!" + name + " <@(!)?\\d+>$")) {
+            if (event.getMessage().getContentRaw().matches(Main.commandPrefix.replace("$", "\\$") + name + " <@!?\\d+> \\d+$")) {
+                duration = Long.parseLong(event.getArgs().replaceAll("(<@!?\\d+>)", "").replaceAll("[^\\d+]", ""));
+            } else if (event.getMessage().getContentRaw().matches(Main.commandPrefix.replace("$", "\\$") + name + " <@!?\\d+>$")) {
                 duration = Main.defaultTimeout;
             } else {
-                event.reply("invalid command format");
+                event.reply("invalid command format ..");
                 sendErrorMessage(event.getTextChannel(), event.getMember());
                 return;
             }
@@ -256,10 +260,11 @@ class Commands {
             }
 
             gc.addSingleRoleToMember(event.getMessage().getMentionedMembers().get(0),
-                    event.getGuild().getRolesByName("servermuted", true).get(0)).queue(success -> {
-
+                    event.getGuild().getRolesByName("Server Muted", true).get(0)).queue(success -> {
+                        activeTimeouts.add(event.getMessage().getMentionedMembers().get(0));
                 gc.removeSingleRoleFromMember(event.getMessage().getMentionedMembers().get(0),
-                        event.getGuild().getRolesByName("servermuted", true).get(0)).queueAfter(duration, TimeUnit.SECONDS, success2 -> {
+                        event.getGuild().getRolesByName("Server Muted", true).get(0)).queueAfter(duration, TimeUnit.SECONDS, success2 -> {
+                            activeTimeouts.remove(event.getMessage().getMentionedMembers().get(0));
                     event.reply("Timeout Expired For User: " + event.getMessage().getMentionedUsers().get(0).getName());
                 }, error -> {
                     event.reply("error removing timeout on user");
@@ -278,7 +283,7 @@ class Commands {
             builder.setTitle("Invalid Usage");
             builder.setAuthor(member.getUser().getName(), member.getUser().getAvatarUrl(), member.getUser().getAvatarUrl());
             builder.setColor(Color.decode("#FF1010"));
-            builder.setDescription("Proper usage: !timeout [@user] [duration]");
+            builder.setDescription("Proper usage: " + Main.commandPrefix + "timeout [@user] [duration]");
             builder.addField("[] required", "", false);
             channel.sendMessage(builder.build()).queue(message -> message.delete().queueAfter(10, TimeUnit.SECONDS));
 
@@ -455,9 +460,7 @@ class Commands {
         protected void execute(CommandEvent event) {
 
             Guild guild = event.getGuild();
-
             GuildController guildController = guild.getController();
-
             List<Member> mentionedMembers = event.getMessage().getMentionedMembers();
 
             if (!event.getMessage().getMember().hasPermission(Permission.KICK_MEMBERS)) {
@@ -502,7 +505,7 @@ class Commands {
 
     public static class AssignRole extends Command {
 
-        AssignRole(){
+        AssignRole() {
             this.name = "assign";
             this.aliases = new String[]{"roleassign", "role", "assign", "assignrole", "ar", "ra"};
             this.help = "[RESERVED - SK]assigns role to user";
@@ -512,25 +515,31 @@ class Commands {
         protected void execute(CommandEvent event) {
 
             // Role Assignment for SK Gaming Community
-            if(event.getChannel().getId().equals(EventHandler.SK_ROLE_CHANNEL_ID)){
+            if (event.getChannel().getId().equals(EventHandler.SK_ROLE_CHANNEL_ID)) {
 
-                if(event.getArgs().equals("Rainbow Six")){
+                if (event.getArgs().equals("Rainbow Six")) {
                     event.getGuild().getController().addSingleRoleToMember(event.getMember(), event.getGuild().getRolesByName("Rainbow Six", false).get(0)).queue(success -> {
                         event.reply(event.getAuthor().getAsMention() + " Assigned Role: " + event.getGuild().getRolesByName("Rainbow Six", false).get(0).getName());
                     });
+                } else if (event.getArgs().equals("Live Notifications")) {
+                    event.getGuild().getController().addRolesToMember(event.getMember(), event.getGuild().getRolesByName("Live Notifications", false).get(0)).queue(success -> {
+                        event.reply(event.getAuthor().getAsMention() + " Assigned Role: " + event.getGuild().getRolesByName("Live Notifications", false).get(0).getName());
+                    });
+                } else if (event.getArgs().equals("Rainbow Six News")) {
+                    event.getGuild().getController().addRolesToMember(event.getMember(), event.getGuild().getRolesByName("Rainbow Six News", false).get(0)).queue(success -> {
+                        event.reply(event.getAuthor().getAsMention() + " Assigned Role: " + event.getGuild().getRolesByName("Rainbow Six News", false).get(0).getName());
+                    });
                 }
-
             } else {
-
                 event.reply(event.getAuthor().getAsMention() + " Role assignment is reserved for SK Gaming Community::role-assignment.");
-
             }
         }
+
     }
 
     public static class ListRoles extends Command {
 
-        ListRoles(){
+        ListRoles() {
             this.name = "roles";
             this.aliases = new String[]{"listroles", "lsroles", "roleslist", "roleshelp"};
             this.help = "[RESERVED - SK] lists all available roles";
@@ -538,7 +547,7 @@ class Commands {
 
         @Override
         protected void execute(CommandEvent event) {
-            if(event.getChannel().getId().equals(EventHandler.SK_ROLE_CHANNEL_ID)){
+            if (event.getChannel().getId().equals(EventHandler.SK_ROLE_CHANNEL_ID)) {
                 event.reply("**ROLES:**\nRainbow Six\nRainbow Six News\n");
             } else {
                 event.reply(event.getAuthor().getAsMention() + " This command is reserved for SK Gaming Community::role-assignment.");
@@ -613,9 +622,9 @@ class Commands {
 
     }
 
-    static class AdminCommand extends Command{
+    static class AdminCommand extends Command {
 
-        AdminCommand(){
+        AdminCommand() {
             this.name = "admin";
             this.help = "[RESERVED - ADMIN] changes bot settings for guilds.";
         }
@@ -623,9 +632,9 @@ class Commands {
         @Override
         protected void execute(CommandEvent event) {
 
-            if(event.getAuthor().getId().equals(Main.ADMIN_ID)) {
+            if (event.getAuthor().getId().equals(Main.ADMIN_ID)) {
             } else {
-                event.reply( event.getAuthor().getAsMention() + " This command is reserved for SlothBot administrators, this is a temporary measure until the bot is setup for individual guilds/servers.");
+                event.reply(event.getAuthor().getAsMention() + " This command is reserved for SlothBot administrators, this is a temporary measure until the bot is setup for individual guilds/servers.");
             }
 
         }

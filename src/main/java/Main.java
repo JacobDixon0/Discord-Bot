@@ -33,7 +33,7 @@ public class Main {
 
     static String hostName = "unknown";
     static String gamePlaying = "RoyalSlothKing.com";
-    private static String commandPrefix = "s$";
+    static String commandPrefix = "s$";
     static int defaultTimeout = 10;
     private static boolean headless = true;
 
@@ -84,7 +84,7 @@ public class Main {
     }
 
     static void terminalInput() {
-        System.out.print("SlothBot >>> ");
+        System.out.print("> ");
         Scanner scanner = new Scanner(System.in);
         String s = scanner.nextLine();
 
@@ -94,7 +94,6 @@ public class Main {
             return;
         } else if (s.equals("exit")) {
             return;
-
         }
         terminalInput();
     }

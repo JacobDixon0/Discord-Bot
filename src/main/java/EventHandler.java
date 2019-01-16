@@ -35,7 +35,15 @@ public class EventHandler extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildMessageReceived(GuildMessageReceivedEvent event) {}
+    public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+
+        if (!event.getAuthor().getId().equals(Main.ID)) {
+            Main.consoleOut("(" + event.getGuild().getName() + "::" + event.getChannel().getName() + ") " + event.getAuthor().getName() + ": \"" + event.getMessage().getContentRaw() + "\"");
+        } else {
+            Main.consoleOut("(" + event.getGuild().getName() + "::" + event.getChannel().getName() + ") " + event.getAuthor().getName() + ": \"" + event.getMessage().getContentRaw() + "\"");
+        }
+
+    }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
@@ -44,15 +52,7 @@ public class EventHandler extends ListenerAdapter {
             event.getPrivateChannel().getUser().openPrivateChannel().queue(channel -> {
                 channel.sendMessage("This bot is not setup to handle private messages, please contact an administrator for your server/guild.").queue();
             });
-            return;
         }
-
-        if (!event.getAuthor().getId().equals(Main.ID)) {
-            Main.consoleOut("(" + event.getGuild().getName() + "::" + event.getTextChannel().getName() + ") " + event.getAuthor().getName() + ": \"" + event.getMessage().getContentRaw() + "\"");
-        } else {
-            Main.consoleOut("(" + event.getGuild().getName() + "::" + event.getTextChannel().getName() + ") " + event.getAuthor().getName() + ": \"" + event.getMessage().getContentRaw() + "\"");
-        }
-
     }
 
     @Override
@@ -64,7 +64,5 @@ public class EventHandler extends ListenerAdapter {
                 event.getGuild().getTextChannelById(SK_ROLE_CHANNEL_ID).sendMessage("Welcome to the server " + event.getMember().getAsMention() + "!").queue();
             }
         }
-
     }
-
 }

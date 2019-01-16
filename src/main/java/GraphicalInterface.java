@@ -218,7 +218,7 @@ public class GraphicalInterface extends Application {
             txt.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 16px;");
             if(channel.canTalk()) {
                 txt.setFill(Color.WHITE);
-                txt.setOnMouseEntered(e -> txt.setFill(Color.color(0.5, 0.5, 0.5)));
+                txt.setOnMouseEntered(e -> txt.setFill(Color.GREY));
                 txt.setOnMouseExited(e -> txt.setFill(Color.WHITE));
                 txt.setOnMouseClicked(e ->
                         serverListPopup.setScene(messageGuildChannel(channel, serverListPopup, scene))

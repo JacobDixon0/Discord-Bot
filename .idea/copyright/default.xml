@@ -1,0 +1,7 @@
+<component name="CopyrightManager">
+  <copyright>
+    <option name="keyword" value="Name: $project.name" />
+    <option name="notice" value="Name: &amp;#36;project.name&#10;Date: &amp;#36;today.day/&amp;#36;today.month/&amp;#36;today.year&#10;Author(s): Jacob Dixon (RoyalSlothKing) @RoyalSlothKing&#10;Repo: https://github.com/JacobDixon0/discord-bot" />
+    <option name="myName" value="default" />
+  </copyright>
+</component>
