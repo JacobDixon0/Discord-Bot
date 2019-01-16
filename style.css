@@ -1,0 +1,50 @@
+/*
+ * Name: discord-bot
+ * Date: 15/1/2019
+ * Author(s): Jacob Dixon (RoyalSlothKing) @RoyalSlothKing.com
+ * Repo: https://github.com/JacobDixon0/discord-bot
+ */
+
+.root {
+    -fx-background-color: #2f3136;
+}
+
+.text-field {
+    -fx-background-color: #484b51;
+    -fx-background-radius: 2px;
+    -fx-text-fill: #FFFFFF;
+}
+
+.button {
+    -fx-background-color: #42464d;
+    -fx-text-fill: #f5f9ff;
+    -fx-background-radius: 2px;
+}
+
+.button:hover {
+    -fx-background-color: #353940;
+}
+
+.radio-button {
+    -fx-text-fill: #FFFFFF;
+}
+
+.radio-button .radio {
+    -fx-background-color: #42464d;
+}
+
+.radio-button .dot {
+    -fx-background-color: #42464d;
+}
+
+.radio-button:selected .dot {
+    -fx-background-color: #f5f9ff;
+}
+
+#stop-button {
+    -fx-background-color: #991d1c;
+}
+
+#stop-button:hover {
+    -fx-background-color: #7a1d1c;
+}
