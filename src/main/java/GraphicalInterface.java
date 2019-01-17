@@ -24,6 +24,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.awt.*;
@@ -37,6 +38,8 @@ public class GraphicalInterface extends Application {
 
     private static int[] windowSize = {250, 140};
     private static int[] popupSize = {400, 400};
+
+    private static String popupDiologPromptText = "";
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -152,7 +155,7 @@ public class GraphicalInterface extends Application {
     }
 
     private static void openServerListPopup() {
-        Stage serverListPopup = new Stage();
+        Stage popupStage = new Stage();
         Pane root = new Pane();
         VBox serverList = new VBox(10);
         Scene scene = new Scene(root, popupSize[0], popupSize[1]);
@@ -162,7 +165,7 @@ public class GraphicalInterface extends Application {
         for (Guild guild : Main.jda.getGuilds()) {
             Button btn = new Button(guild.getName());
             btn.setOnAction(e -> {
-                serverListPopup.setScene(serverSelectedPopup(serverListPopup, scene, guild));
+                popupStage.setScene(serverSelectedPopup(popupStage, scene, guild));
             });
             serverList.getChildren().add(btn);
         }
@@ -171,19 +174,19 @@ public class GraphicalInterface extends Application {
         serverList.setLayoutY(10);
         root.getChildren().add(serverList);
 
-        loadStageAssets(serverListPopup, scene);
-        serverListPopup.setScene(scene);
-        serverListPopup.setTitle("SlothBot - Server List");
-        serverListPopup.setAlwaysOnTop(true);
-        serverListPopup.initModality(Modality.APPLICATION_MODAL);
-        serverListPopup.setOnCloseRequest(e -> {
+        loadStageAssets(popupStage, scene);
+        popupStage.setScene(scene);
+        popupStage.setTitle("SlothBot - Server List");
+        popupStage.setAlwaysOnTop(true);
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.setOnCloseRequest(e -> {
             inMenu = false;
-            serverListPopup.close();
+            popupStage.close();
         });
-        serverListPopup.show();
+        popupStage.show();
     }
 
-    private static Scene serverSelectedPopup(Stage serverListPopup, Scene serverList, Guild guild) {
+    private static Scene serverSelectedPopup(Stage popupStage, Scene serverList, Guild guild) {
 
         Pane root = new Pane();
         VBox channelList = new VBox();
@@ -199,15 +202,22 @@ public class GraphicalInterface extends Application {
         btn0.setLayoutX(10);
         btn0.setLayoutY(10);
         btn0.setOnAction(e ->
-                serverListPopup.setScene(serverList)
+                popupStage.setScene(serverList)
         );
+
+        Button btn1 = new Button("Members");
+        btn1.setLayoutX(60);
+        btn1.setLayoutY(10);
+        btn1.setOnAction(e -> {
+            popupStage.setScene(serverMembersPopup(popupStage, scene, guild));
+        });
 
         Rectangle r0 = new Rectangle(10, 45, 140, guild.getTextChannels().size() * 23);
         r0.setFill(Color.web("#42464d"));
         r0.setArcHeight(10);
         r0.setArcWidth(10);
 
-        root.getChildren().addAll(btn0, r0);
+        root.getChildren().addAll(btn0, btn1, r0);
 
         for (TextChannel channel : guild.getTextChannels()) {
             if(channel.getName().length() > longestServerName){
@@ -221,7 +231,7 @@ public class GraphicalInterface extends Application {
                 txt.setOnMouseEntered(e -> txt.setFill(Color.GREY));
                 txt.setOnMouseExited(e -> txt.setFill(Color.WHITE));
                 txt.setOnMouseClicked(e ->
-                        serverListPopup.setScene(messageGuildChannel(channel, serverListPopup, scene))
+                        popupStage.setScene(messageGuildChannel(channel, popupStage, scene))
                 );
             } else {
                 txt.setFill(Color.GREY);
@@ -233,6 +243,40 @@ public class GraphicalInterface extends Application {
         r0.setWidth(longestServerName * 9);
 
         root.getChildren().add(channelList);
+
+        return scene;
+    }
+
+    private static Scene serverMembersPopup(Stage popupStage, Scene prevScene, Guild guild){
+
+        Pane root = new Pane();
+        VBox memberList = new VBox();
+        Scene scene = new Scene(root, popupSize[0], popupSize[1]);
+
+        scene.getStylesheets().add("file:./style.css");
+
+        memberList.setLayoutX(20);
+        memberList.setLayoutY(45);
+
+        Rectangle r0 = new Rectangle(10, 45, 140, guild.getMembers().size() * 24);
+        r0.setFill(Color.web("#42464d"));
+        r0.setArcHeight(10);
+        r0.setArcWidth(10);
+
+        root.getChildren().add(backButton(10, 10, popupStage, prevScene));
+
+        for(Member m : guild.getMembers()){
+            Text txt = new Text(m.getEffectiveName());
+            txt.setFill(Color.WHITE);
+            txt.setStyle("-fx-font-size: 16px;");
+            txt.setX(10);
+            txt.setOnMouseEntered(e -> txt.setFill(Color.GREY));
+            txt.setOnMouseExited(e -> txt.setFill(Color.WHITE));
+            txt.setOnMouseClicked(e -> popupStage.setScene(memberSelectedPopup(popupStage, scene, m)));
+            memberList.getChildren().add(txt);
+        }
+
+        root.getChildren().addAll(r0, memberList);
 
         return scene;
     }
@@ -279,6 +323,44 @@ public class GraphicalInterface extends Application {
         root.requestFocus();
 
         return scene;
+    }
+
+    private static Scene memberSelectedPopup(Stage popupStage, Scene prevScene, Member member){
+
+        Pane root = new Pane();
+        Scene scene = new Scene(root, 200, 100);
+
+        loadStageAssets(scene);
+
+        root.getChildren().add(backButton(10, 10, popupStage, prevScene));
+
+        Button btn0 = new Button("Ban");
+        btn0.setLayoutX(10);
+        btn0.setLayoutY(50);
+        btn0.setId("stop-button");
+        btn0.setOnAction(e -> {
+            if(member.getGuild().getSelfMember().canInteract(member)) {
+                member.getGuild().getController().ban(member, 0).queue();
+            } else {
+                System.err.println("ERROR: Could not ban member: " + member.getEffectiveName());
+            }
+        });
+
+        Button btn1 = new Button("Message User");
+        btn1.setLayoutX(50);
+        btn1.setLayoutY(50);
+
+        root.getChildren().addAll(btn0, btn1);
+
+        return scene;
+    }
+
+    private static Button backButton(int x, int y, Stage stage, Scene prevScene){
+        Button btn = new Button("Back");
+        btn.setLayoutX(x);
+        btn.setLayoutY(y);
+        btn.setOnAction(e -> stage.setScene(prevScene));
+        return btn;
     }
 
     private static void loadStageAssets(Stage stage, Scene scene) {

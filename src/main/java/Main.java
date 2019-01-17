@@ -44,6 +44,11 @@ public class Main {
 
     public static void main(String[] args) throws LoginException {
 
+        if (!tokenFile.exists()){
+            System.err.println("ERROR: Missing Discord application token file \"token.txt\".");
+            System.exit(-1);
+        }
+
         try {
             FileReader reader = new FileReader(tokenFile);
             BufferedReader bufferedReader = new BufferedReader(reader);

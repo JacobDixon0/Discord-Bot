@@ -26,12 +26,6 @@ public class EventHandler extends ListenerAdapter {
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
 
-        // Welcome for SK Gaming Community
-        if (event.getGuild().getId().equals(SK_GUILD_ID)) {
-            event.getGuild().getTextChannelById(SK_GUILD_ID).sendMessage("**Welcome to the server ** " +
-                    event.getMember().getAsMention() + "**!** To become a member, read <#" + SK_RULES_CHANNEL_ID + ">, then come back here and type \"s$accept\".").queue();
-        }
-
     }
 
     @Override
