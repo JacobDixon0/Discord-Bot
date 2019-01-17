@@ -5,15 +5,16 @@
  * Repo: https://github.com/JacobDixon0/discord-bot
  */
 
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.*;
 
 import javax.security.auth.login.LoginException;
-import java.awt.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -41,6 +42,8 @@ public class Main {
 
     private static File tokenFile = new File(EXE_PATH + "/token.txt");
     private static File configFile = new File(EXE_PATH + "/discord-bot.config");
+
+    static ArrayList<Command> commands = new ArrayList<>();
 
     public static void main(String[] args) throws LoginException {
 
@@ -80,7 +83,8 @@ public class Main {
                 new Commands.VoiceDisconnectCommand(), new Commands.TempMuteCommand(),
                 new Commands.HostInfoCommand(), new Commands.UptimeCommand(),
                 new Commands.RevokeBanCommand(), new Commands.AdminCommand(),
-                new Commands.AssignRole(), new Commands.ListRoles()
+                new Commands.AssignRole(), new Commands.ListRoles(),
+                new Commands.BannedWordsAdd()
         );
 
         jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListener(new EventHandler(), commandClientBuilder.build(), new WordFilter()).buildAsync();

@@ -30,6 +30,7 @@ class Commands {
             this.name = "hostname";
             this.aliases = new String[]{"servername", "hostinfo", "host", "serverinfo", "server"};
             this.help = "gets the server's hostname";
+            Main.commands.add(this);
         }
 
         @Override
@@ -43,6 +44,7 @@ class Commands {
         PingCommand() {
             this.name = "ping";
             this.help = "ping SlothBot";
+            Main.commands.add(this);
         }
 
         @Override
@@ -57,6 +59,7 @@ class Commands {
             this.name = "info";
             this.aliases = new String[]{"VERSION"};
             this.help = "bot info";
+            Main.commands.add(this);
         }
 
         @Override
@@ -74,6 +77,7 @@ class Commands {
             this.name = "uptime";
             this.aliases = new String[]{"runtime"};
             this.help = "get bot uptime";
+            Main.commands.add(this);
         }
 
         @Override
@@ -90,6 +94,7 @@ class Commands {
             this.name = "helloworld";
             this.aliases = new String[]{"hw"};
             this.help = "says hello";
+            Main.commands.add(this);
         }
 
         @Override
@@ -105,6 +110,7 @@ class Commands {
             this.name = "kick";
             this.aliases = new String[]{"k"};
             this.help = "kick user";
+            Main.commands.add(this);
         }
 
         @Override
@@ -146,6 +152,7 @@ class Commands {
             this.name = "ban";
             this.aliases = new String[]{"b"};
             this.help = "ban user";
+            Main.commands.add(this);
         }
 
         @Override
@@ -199,6 +206,7 @@ class Commands {
             this.name = "unban";
             this.aliases = new String[]{"revokeban", "removeban", "uban", "ub"};
             this.help = "ban a user";
+            Main.commands.add(this);
         }
 
         @Override
@@ -216,12 +224,38 @@ class Commands {
         }
     }
 
+    public static class BannedWordsAdd extends Command {
+
+        BannedWordsAdd(){
+            this.name = "banphrase";
+            this.aliases = new String[]{"banword", "bannedphraseadd", "bannedwordadd", "addbannedword", "addbannedphrase"};
+            this.help = "[RESERVED - Moderator] adds a banned phrase.";
+            this.requiredRole = "Moderator";
+            Main.commands.add(this);
+        }
+
+        @Override
+        protected void execute(CommandEvent event) {
+
+            Member member = event.getMember();
+            Guild guild = event.getGuild();
+
+            if(!member.hasPermission(Permission.MESSAGE_MANAGE)){
+                event.reply("Invalid Permissions");
+                return;
+            }
+
+        }
+
+    }
+
     public static class TempMuteCommand extends Command {
 
         TempMuteCommand() {
             this.name = "timeout";
             this.aliases = new String[]{"tempmute", "tm"};
             this.help = "timeout member";
+            Main.commands.add(this);
         }
 
         @Override
@@ -297,6 +331,7 @@ class Commands {
             this.name = "softban";
             this.aliases = new String[]{"sban", "sb", "purge"};
             this.help = "softban user";
+            Main.commands.add(this);
         }
 
         @Override
@@ -342,6 +377,7 @@ class Commands {
             this.name = "mute";
             this.aliases = new String[]{"m"};
             this.help = "mute user";
+            Main.commands.add(this);
         }
 
         @Override
@@ -398,6 +434,7 @@ class Commands {
             this.name = "unmute";
             this.aliases = new String[]{"um"};
             this.help = "unmute user";
+            Main.commands.add(this);
         }
 
         @Override
@@ -454,6 +491,7 @@ class Commands {
             this.name = "timeout10";
             this.aliases = new String[]{"tm10", "tempmute10"};
             this.help = "[DEPRECATED] temporally mute user for " + Main.defaultTimeout + "s";
+            Main.commands.add(this);
         }
 
         @Override
@@ -509,6 +547,7 @@ class Commands {
             this.name = "assign";
             this.aliases = new String[]{"roleassign", "role", "assign", "assignrole", "ar", "ra"};
             this.help = "[RESERVED - SK]assigns role to user";
+            Main.commands.add(this);
         }
 
         @Override
@@ -543,6 +582,7 @@ class Commands {
             this.name = "roles";
             this.aliases = new String[]{"listroles", "lsroles", "roleslist", "roleshelp"};
             this.help = "[RESERVED - SK] lists all available roles";
+            Main.commands.add(this);
         }
 
         @Override
@@ -561,6 +601,7 @@ class Commands {
             this.name = "join";
             this.aliases = new String[]{"c", "connect", "voiceconnect"};
             this.help = "joins a voice channel";
+            Main.commands.add(this);
         }
 
         @Override
@@ -603,6 +644,7 @@ class Commands {
             this.name = "leave";
             this.aliases = new String[]{"dc", "disconnect", "voicedisconnect"};
             this.help = "leaves a voice channel";
+            Main.commands.add(this);
         }
 
         @Override
@@ -626,7 +668,8 @@ class Commands {
 
         AdminCommand() {
             this.name = "admin";
-            this.help = "[RESERVED - ADMIN] changes bot settings for guilds.";
+            this.help = "[RESERVED - Bot Admin] changes bot settings for guilds.";
+            Main.commands.add(this);
         }
 
         @Override
