@@ -22,7 +22,8 @@ import java.util.regex.Pattern;
 
 public class Main {
 
-    private static final String EXE_PATH = System.getProperty("user.dir");
+    static final String EXE_PATH = System.getProperty("user.dir");
+    static final String GUILD_PROFILES_PATH = EXE_PATH + "/guild-profiles";
     static final String VERSION = "0.8a";
     static final String ID = "433070903614636032";
     static final String ADMIN_ID = "282331714603450368";
@@ -87,9 +88,19 @@ public class Main {
                 new Commands.BannedWordsAdd()
         );
 
-        jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListener(new EventHandler(), commandClientBuilder.build(), new WordFilter()).buildAsync();
+        /*jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListener(new EventHandler(), commandClientBuilder.build(), new WordFilter()).buildAsync();*/
+        try {
+            jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListener(new EventHandler(), commandClientBuilder.build(), new WordFilter()).buildBlocking();
+        } catch (InterruptedException e){
+            e.printStackTrace();
+            System.err.println("ERROR: Failed to build JDA");
+            System.exit(-1);
+        }
+
+        loadGuildProfiles();
 
         if (headless) GraphicalInterface.initialize(args);
+
     }
 
     static void terminalInput() {
@@ -205,6 +216,35 @@ public class Main {
         }
         System.out.println(dateFormat.format(new Date()) + " sent PSA to all guilds in default channel with message: \"" + msg + "\"");
 
+    }
+
+    private static void loadGuildProfiles(){
+        if(!new File(GUILD_PROFILES_PATH).exists()){
+            File guildProfiles = new File(GUILD_PROFILES_PATH);
+            boolean temp = guildProfiles.mkdir();
+            if(temp){
+                System.out.println("INFO: Created guild-profiles directory at " + guildProfiles.getPath());
+            } else {
+                System.err.println("ERROR: Could not create guild-profiles directory");
+            }
+        }
+
+        /*try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e){
+            e.printStackTrace();
+        }*/
+        for(Guild guild : jda.getGuilds()){
+            if(!new File(GUILD_PROFILES_PATH + "/" + guild.getId()).exists()){
+                File guildProfile = new File(GUILD_PROFILES_PATH + "/" + guild.getId());
+                boolean temp = guildProfile.mkdir();
+                if(temp){
+                    System.out.println("INFO: Created guild profile for guild: \"" + guild.getName() + "\" at " + guildProfile.getPath());
+                } else {
+                    System.err.println("ERROR: Could not create guild profile for guild: \"" + guild.getName() + "\"");
+                }
+            }
+        }
     }
 
     static boolean checkMessageValidity(String str){

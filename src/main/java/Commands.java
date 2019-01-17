@@ -14,6 +14,7 @@ import net.dv8tion.jda.core.managers.AudioManager;
 import net.dv8tion.jda.core.managers.GuildController;
 
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -230,7 +231,6 @@ class Commands {
             this.name = "banphrase";
             this.aliases = new String[]{"banword", "bannedphraseadd", "bannedwordadd", "addbannedword", "addbannedphrase"};
             this.help = "[RESERVED - Moderator] adds a banned phrase.";
-            this.requiredRole = "Moderator";
             Main.commands.add(this);
         }
 
@@ -245,8 +245,42 @@ class Commands {
                 return;
             }
 
+            if(WordFilter.addBannedPhrase(guild, event.getArgs())){
+                event.reply("Added Banned Phrase");
+            } else {
+                event.reply("An internal error occurred while attempting to add banned phrase, if this problem persists, please contact the bot administrator.");
+            }
+
         }
 
+    }
+
+    public static class BannedWordsRemove extends Command {
+
+        BannedWordsRemove(){
+            this.name = "unbanphrase";
+            this.aliases = new String[]{"unbanword", "bannedphraseremove", "bannedwordremove", "removebannedword", "removebannedphrase"};
+            this.help = "[RESERVED - Moderator] removes a banned phrase.";
+        }
+
+        @Override
+        protected void execute(CommandEvent event) {
+
+            Member member = event.getMember();
+            Guild guild = event.getGuild();
+
+            if(!member.hasPermission(Permission.MESSAGE_MANAGE)){
+                event.reply("Invalid Permissions");
+                return;
+            }
+
+            if(WordFilter.removeBannedWord(guild, event.getArgs())){
+                event.reply("Removed Banned Phrase");
+            } else {
+                event.reply("An internal error occurred while attempting to remove banned phrase, if this problem persists, please contact the bot administrator.");
+            }
+
+        }
     }
 
     public static class TempMuteCommand extends Command {

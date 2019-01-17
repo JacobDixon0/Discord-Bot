@@ -6,11 +6,15 @@
  */
 
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class WordFilter extends ListenerAdapter {
 
@@ -47,6 +51,75 @@ public class WordFilter extends ListenerAdapter {
 
             }
 
+        }
+
+        static boolean addBannedPhrase(Guild guild, String bannedPhrase){
+
+            File bannedWordsList = new File(Main.GUILD_PROFILES_PATH + "/" + guild.getId() + "/banned-phrases.profile");
+
+            if(!bannedWordsList.exists()){
+                try {
+                    if(bannedWordsList.createNewFile()){
+                        System.out.println("INFO: Created banned-phrases profile for guild: \"" + guild.getName() + "\" at " + bannedWordsList.getPath());
+                    } else {
+                        System.err.println("ERROR: Could not create banned-phrases profile for guild: \"" + guild.getName() + "\"");
+                    }
+                } catch (IOException e){
+                    e.printStackTrace();
+                    System.err.println("ERROR: Could not create banned-phrases profile for guild: \"" + guild.getName() + "\"");
+                    return false;
+                }
+            }
+
+            try {
+                FileWriter fileWriter = new FileWriter("guild-profiles/" + guild.getId() + "/banned-phrases.profile", true);
+                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+                PrintWriter printWriter = new PrintWriter(bufferedWriter);
+                printWriter.println(bannedPhrase);
+                printWriter.close();
+
+            } catch (IOException e){
+                e.printStackTrace();
+                System.err.println("ERROR: Could not modify banned-phrases profile for guild: \"" + guild.getName() + "\"");
+                return false;
+            }
+
+            return true;
+        }
+
+        static boolean removeBannedWord(Guild guild, String bannedWord){
+
+            File bannedWordsList = new File(Main.GUILD_PROFILES_PATH + "/" + guild.getId() + "/banned-phrases.profile");
+
+            if(!bannedWordsList.exists()){
+                return true;
+            }
+
+            ArrayList<String> bannedWords = new ArrayList<>();
+
+            try {
+                Scanner scanner = new Scanner(bannedWordsList);
+
+                while (scanner.hasNextLine()){
+                    if(!scanner.nextLine().equals(bannedWord)) {
+                        bannedWords.add(scanner.nextLine());
+                    }
+                }
+
+                FileWriter fileWriter = new FileWriter("guild-profiles/" + guild.getId() + "/banned-phrases.profile");
+                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+                PrintWriter printWriter = new PrintWriter(bufferedWriter);
+
+                for(String string : bannedWords){
+                    printWriter.println(string);
+                }
+
+            } catch (IOException e){
+                e.printStackTrace();
+                System.err.println("ERROR: Could not remove banned word");
+                return false;
+            }
+            return true;
         }
 
     }
