@@ -229,7 +229,7 @@ class Commands {
 
         BannedWordsAdd(){
             this.name = "banphrase";
-            this.aliases = new String[]{"banword", "bannedphraseadd", "bannedwordadd", "addbannedword", "addbannedphrase"};
+            this.aliases = new String[]{"bp", "banword", "bannedphraseadd", "bannedwordadd", "addbannedword", "addbannedphrase"};
             this.help = "[RESERVED - Moderator] adds a banned phrase.";
             Main.commands.add(this);
         }
@@ -259,7 +259,7 @@ class Commands {
 
         BannedWordsRemove(){
             this.name = "unbanphrase";
-            this.aliases = new String[]{"unbanword", "bannedphraseremove", "bannedwordremove", "removebannedword", "removebannedphrase"};
+            this.aliases = new String[]{"ubp", "unbanword", "bannedphraseremove", "bannedwordremove", "removebannedword", "removebannedphrase"};
             this.help = "[RESERVED - Moderator] removes a banned phrase.";
         }
 

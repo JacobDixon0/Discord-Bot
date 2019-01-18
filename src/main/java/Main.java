@@ -85,7 +85,7 @@ public class Main {
                 new Commands.HostInfoCommand(), new Commands.UptimeCommand(),
                 new Commands.RevokeBanCommand(), new Commands.AdminCommand(),
                 new Commands.AssignRole(), new Commands.ListRoles(),
-                new Commands.BannedWordsAdd()
+                new Commands.BannedWordsAdd(), new Commands.BannedWordsRemove()
         );
 
         /*jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListener(new EventHandler(), commandClientBuilder.build(), new WordFilter()).buildAsync();*/

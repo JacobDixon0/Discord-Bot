@@ -72,7 +72,7 @@ public class WordFilter extends ListenerAdapter {
             }
 
             try {
-                FileWriter fileWriter = new FileWriter("guild-profiles/" + guild.getId() + "/banned-phrases.profile", true);
+                FileWriter fileWriter = new FileWriter(Main.GUILD_PROFILES_PATH + "/" + guild.getId() + "/banned-phrases.profile", true);
                 BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
                 PrintWriter printWriter = new PrintWriter(bufferedWriter);
                 printWriter.println(bannedPhrase);
@@ -101,18 +101,21 @@ public class WordFilter extends ListenerAdapter {
                 Scanner scanner = new Scanner(bannedWordsList);
 
                 while (scanner.hasNextLine()){
-                    if(!scanner.nextLine().equals(bannedWord)) {
-                        bannedWords.add(scanner.nextLine());
+                    String line = scanner.nextLine();
+                    if(!line.equals(bannedWord)){
+                        bannedWords.add(line);
                     }
                 }
 
-                FileWriter fileWriter = new FileWriter("guild-profiles/" + guild.getId() + "/banned-phrases.profile");
+                FileWriter fileWriter = new FileWriter(Main.GUILD_PROFILES_PATH + "/" + guild.getId() + "/banned-phrases.profile");
                 BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
                 PrintWriter printWriter = new PrintWriter(bufferedWriter);
 
                 for(String string : bannedWords){
                     printWriter.println(string);
                 }
+
+                printWriter.close();
 
             } catch (IOException e){
                 e.printStackTrace();
