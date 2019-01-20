@@ -1,7 +1,7 @@
 /*
  * Name: discord-bot
- * Date: 15/1/2019
- * Author(s): Jacob Dixon (RoyalSlothKing) @RoyalSlothKing.com
+ * Date: 20/1/2019
+ * Author(s): Jacob Dixon (RoyalSlothKing) @RoyalSlothKing
  * Repo: https://github.com/JacobDixon0/discord-bot
  */
 
@@ -18,7 +18,7 @@ import java.util.Scanner;
 
 public class WordFilter extends ListenerAdapter {
 
-    private final List<String> RESTRICTED_WORDS = Arrays.asList(
+    static final List<String> RESTRICTED_WORDS = Arrays.asList(
             "windows is better than linux", "pineapple"
     );
 

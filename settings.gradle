@@ -1,2 +1,9 @@
+/*
+ * Name: discord-bot
+ * Date: 20/1/2019
+ * Author(s): Jacob Dixon (RoyalSlothKing) @RoyalSlothKing
+ * Repo: https://github.com/JacobDixon0/discord-bot
+ */
+
 rootProject.name = 'discord-bot'
 

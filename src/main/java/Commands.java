@@ -1,7 +1,7 @@
 /*
  * Name: discord-bot
- * Date: 15/1/2019
- * Author(s): Jacob Dixon (RoyalSlothKing) @RoyalSlothKing.com
+ * Date: 20/1/2019
+ * Author(s): Jacob Dixon (RoyalSlothKing) @RoyalSlothKing
  * Repo: https://github.com/JacobDixon0/discord-bot
  */
 
@@ -309,17 +309,22 @@ class Commands {
                 return;
             }
 
-            String bannedWordsListDisplay = "";
+            String bannedWordsListDisplay0 = "";
+            String bannedWordsListDisplay1 = "";
             for (String string : Main.getBotGuild(event.getGuild()).bannedWords) {
-                bannedWordsListDisplay = bannedWordsListDisplay.concat(string + "\n");
+                bannedWordsListDisplay0 = bannedWordsListDisplay0.concat(string + "\n");
+            }
+            for (String string : WordFilter.RESTRICTED_WORDS) {
+                bannedWordsListDisplay1 = bannedWordsListDisplay1.concat(string + "\n");
             }
             EmbedBuilder eb = new EmbedBuilder();
             eb.setTitle("Banned Phrases");
             eb.setAuthor(event.getMember().getEffectiveName(), event.getMember().getUser().getAvatarUrl(), event.getMember().getUser().getAvatarUrl());
             eb.setColor(Color.decode("#3F57E8"));
             eb.setDescription("Banned phrases for " + event.getGuild().getName());
-            eb.addField("", bannedWordsListDisplay, false);
-
+            eb.addBlankField(false);
+            eb.addField("Guild Bans", bannedWordsListDisplay0, false);
+            eb.addField("Default Bans", bannedWordsListDisplay1, false);
             event.reply(eb.build());
         }
     }
