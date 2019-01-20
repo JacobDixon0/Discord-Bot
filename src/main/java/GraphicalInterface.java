@@ -39,8 +39,6 @@ public class GraphicalInterface extends Application {
     private static int[] windowSize = {250, 140};
     private static int[] popupSize = {400, 400};
 
-    private static String popupDiologPromptText = "";
-
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -55,7 +53,7 @@ public class GraphicalInterface extends Application {
         tf.setMinWidth(180);
         tf.setLayoutX(10);
         tf.setLayoutY(10);
-        tf.setPromptText("Send message to all guilds");
+        tf.setPromptText("Send message to all activeGuilds");
 
         Button btn = new Button("send");
         btn.setLayoutX(10);
@@ -305,10 +303,14 @@ public class GraphicalInterface extends Application {
             if(e.getCode() == KeyCode.ENTER){
                 if(channel.canTalk()) {
                     if(Main.checkMessageValidity(tf.getText())) {
-                        channel.sendMessage(tf.getText()).queue();
+                        if(channel.canTalk()) {
+                            channel.sendMessage(tf.getText()).queue();
+                        } else {
+                            System.err.println("ERROR: Could not send message - Invalid Permissions");
+                        }
                         stage.setScene(prevScene);
                     } else {
-                        System.err.println("ERROR: Invalid Message - no content ");
+                        System.err.println("ERROR: Could not send message - Invalid Message");
                         tf.clear();
                         root.requestFocus();
                     }

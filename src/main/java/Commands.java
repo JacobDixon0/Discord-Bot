@@ -225,12 +225,12 @@ class Commands {
         }
     }
 
-    public static class BannedWordsAdd extends Command {
+    public static class BannedPhrasesAdd extends Command {
 
-        BannedWordsAdd(){
+        BannedPhrasesAdd() {
             this.name = "banphrase";
             this.aliases = new String[]{"bp", "banword", "bannedphraseadd", "bannedwordadd", "addbannedword", "addbannedphrase"};
-            this.help = "[RESERVED - Moderator] adds a banned phrase.";
+            this.help = "[RESERVED - Moderator] Adds a banned phrase.";
             Main.commands.add(this);
         }
 
@@ -240,27 +240,30 @@ class Commands {
             Member member = event.getMember();
             Guild guild = event.getGuild();
 
-            if(!member.hasPermission(Permission.MESSAGE_MANAGE)){
+            if (!member.hasPermission(Permission.MESSAGE_MANAGE)) {
                 event.reply("Invalid Permissions");
                 return;
             }
 
-            if(WordFilter.addBannedPhrase(guild, event.getArgs())){
-                event.reply("Added Banned Phrase");
-            } else {
+            int status = WordFilter.addBannedPhrase(guild, event.getArgs());
+            if (status == 0) {
+                event.reply("Added Banned Phrase: " + "\"" + event.getArgs() + "\"");
+            } else if (status == 1) {
                 event.reply("An internal error occurred while attempting to add banned phrase, if this problem persists, please contact the bot administrator.");
+            } else if (status == 2) {
+                event.reply("The phrase \"" + event.getArgs() + "\"" + " is already banned.");
             }
 
         }
 
     }
 
-    public static class BannedWordsRemove extends Command {
+    public static class BannedPhrasesRemove extends Command {
 
-        BannedWordsRemove(){
+        BannedPhrasesRemove() {
             this.name = "unbanphrase";
             this.aliases = new String[]{"ubp", "unbanword", "bannedphraseremove", "bannedwordremove", "removebannedword", "removebannedphrase"};
-            this.help = "[RESERVED - Moderator] removes a banned phrase.";
+            this.help = "[RESERVED - Moderator] Removes a banned phrase.";
         }
 
         @Override
@@ -269,17 +272,55 @@ class Commands {
             Member member = event.getMember();
             Guild guild = event.getGuild();
 
-            if(!member.hasPermission(Permission.MESSAGE_MANAGE)){
+            if (!member.hasPermission(Permission.MESSAGE_MANAGE)) {
                 event.reply("Invalid Permissions");
                 return;
             }
 
-            if(WordFilter.removeBannedWord(guild, event.getArgs())){
-                event.reply("Removed Banned Phrase");
-            } else {
-                event.reply("An internal error occurred while attempting to remove banned phrase, if this problem persists, please contact the bot administrator.");
+            int status = WordFilter.removeBannedWord(guild, event.getArgs());
+            if (status == 0) {
+                event.reply("Removed Banned Phrase: \"" + event.getArgs() + "\"");
+            } else if (status == 1) {
+                event.reply("An internal error occurred while attempting to add banned phrase, if this problem persists, please contact the bot administrator.");
+            } else if (status == 2) {
+                event.reply("The phrase \"" + event.getArgs() + "\"" + " is not banned.");
+            }
+        }
+    }
+
+    public static class BannedPhrasesList extends Command {
+
+        BannedPhrasesList() {
+            this.name = "listbannedphrases";
+            this.aliases = new String[]{"lbp", "bpl", "bannedphraseslist", "listbannedwords", "bannedwordslist", "bannedphraselist", "bannedwords", "bannedphrases"};
+            this.help = "[RESERVED - Moderator] lists banned phrases for guild";
+        }
+
+        @Override
+        protected void execute(CommandEvent event) {
+
+            if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
+                event.reply(event.getAuthor().getAsMention() + ", You do not have permission to use this command.");
+                return;
             }
 
+            if(Main.getBotGuild(event.getGuild()).bannedWords.isEmpty()){
+                event.reply("There are no banned phrases for this guild.");
+                return;
+            }
+
+            String bannedWordsListDisplay = "";
+            for (String string : Main.getBotGuild(event.getGuild()).bannedWords) {
+                bannedWordsListDisplay = bannedWordsListDisplay.concat(string + "\n");
+            }
+            EmbedBuilder eb = new EmbedBuilder();
+            eb.setTitle("Banned Phrases");
+            eb.setAuthor(event.getMember().getEffectiveName(), event.getMember().getUser().getAvatarUrl(), event.getMember().getUser().getAvatarUrl());
+            eb.setColor(Color.decode("#3F57E8"));
+            eb.setDescription("Banned phrases for " + event.getGuild().getName());
+            eb.addField("", bannedWordsListDisplay, false);
+
+            event.reply(eb.build());
         }
     }
 
@@ -329,10 +370,10 @@ class Commands {
 
             gc.addSingleRoleToMember(event.getMessage().getMentionedMembers().get(0),
                     event.getGuild().getRolesByName("Server Muted", true).get(0)).queue(success -> {
-                        activeTimeouts.add(event.getMessage().getMentionedMembers().get(0));
+                activeTimeouts.add(event.getMessage().getMentionedMembers().get(0));
                 gc.removeSingleRoleFromMember(event.getMessage().getMentionedMembers().get(0),
                         event.getGuild().getRolesByName("Server Muted", true).get(0)).queueAfter(duration, TimeUnit.SECONDS, success2 -> {
-                            activeTimeouts.remove(event.getMessage().getMentionedMembers().get(0));
+                    activeTimeouts.remove(event.getMessage().getMentionedMembers().get(0));
                     event.reply("Timeout Expired For User: " + event.getMessage().getMentionedUsers().get(0).getName());
                 }, error -> {
                     event.reply("error removing timeout on user");
@@ -418,9 +459,7 @@ class Commands {
         protected void execute(CommandEvent event) {
 
             Guild guild = event.getGuild();
-
             GuildController guildController = guild.getController();
-
             List<Member> mentionedMembers = event.getMessage().getMentionedMembers();
 
             if (!event.getMessage().getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
@@ -475,9 +514,7 @@ class Commands {
         protected void execute(CommandEvent event) {
 
             Guild guild = event.getGuild();
-
             GuildController guildController = guild.getController();
-
             List<Member> mentionedMembers = event.getMessage().getMentionedMembers();
 
             if (!event.getMessage().getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
@@ -491,7 +528,6 @@ class Commands {
             }
 
             Member member = mentionedMembers.get(0);
-
             Role roleMuted = guild.getRoles().stream().filter(r -> r.getName().equals("servermuted")).findFirst().orElse(null);
 
             if (member.isOwner()) {
@@ -702,7 +738,7 @@ class Commands {
 
         AdminCommand() {
             this.name = "admin";
-            this.help = "[RESERVED - Bot Admin] changes bot settings for guilds.";
+            this.help = "[RESERVED - Bot Admin] changes bot settings for activeGuilds.";
             Main.commands.add(this);
         }
 
@@ -711,7 +747,7 @@ class Commands {
 
             if (event.getAuthor().getId().equals(Main.ADMIN_ID)) {
             } else {
-                event.reply(event.getAuthor().getAsMention() + " This command is reserved for SlothBot administrators, this is a temporary measure until the bot is setup for individual guilds/servers.");
+                event.reply(event.getAuthor().getAsMention() + " This command is reserved for SlothBot administrators, this is a temporary measure until the bot is setup for individual activeGuilds/servers.");
             }
 
         }

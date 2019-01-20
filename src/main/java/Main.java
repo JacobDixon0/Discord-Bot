@@ -14,16 +14,14 @@ import javax.security.auth.login.LoginException;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main {
 
     static final String EXE_PATH = System.getProperty("user.dir");
-    static final String GUILD_PROFILES_PATH = EXE_PATH + "/guild-profiles";
+    static final String GUILD_PROFILES_PATH = EXE_PATH + "/guild-profiles/";
     static final String VERSION = "0.8a";
     static final String ID = "433070903614636032";
     static final String ADMIN_ID = "282331714603450368";
@@ -46,9 +44,11 @@ public class Main {
 
     static ArrayList<Command> commands = new ArrayList<>();
 
+    static List<BotGuild> activeGuilds = new LinkedList<>();
+
     public static void main(String[] args) throws LoginException {
 
-        if (!tokenFile.exists()){
+        if (!tokenFile.exists()) {
             System.err.println("ERROR: Missing Discord application token file \"token.txt\".");
             System.exit(-1);
         }
@@ -85,19 +85,22 @@ public class Main {
                 new Commands.HostInfoCommand(), new Commands.UptimeCommand(),
                 new Commands.RevokeBanCommand(), new Commands.AdminCommand(),
                 new Commands.AssignRole(), new Commands.ListRoles(),
-                new Commands.BannedWordsAdd(), new Commands.BannedWordsRemove()
+                new Commands.BannedPhrasesAdd(), new Commands.BannedPhrasesRemove(),
+                new Commands.BannedPhrasesList()
         );
 
         /*jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListener(new EventHandler(), commandClientBuilder.build(), new WordFilter()).buildAsync();*/
         try {
             jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListener(new EventHandler(), commandClientBuilder.build(), new WordFilter()).buildBlocking();
-        } catch (InterruptedException e){
+        } catch (InterruptedException e) {
             e.printStackTrace();
             System.err.println("ERROR: Failed to build JDA");
             System.exit(-1);
         }
 
         loadGuildProfiles();
+        updateGuildList();
+        updateGuildProperties();
 
         if (headless) GraphicalInterface.initialize(args);
 
@@ -202,9 +205,8 @@ public class Main {
     }
 
     static void sendAnnouncement(String msg) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("[yyyy/MM/dd HH:mm:ss]");
 
-        if(!checkMessageValidity(msg)){
+        if (!checkMessageValidity(msg)) {
             System.err.println("ERROR: Invalid Message - no content");
             return;
         }
@@ -214,18 +216,17 @@ public class Main {
                 guild.getDefaultChannel().sendMessage(msg).queue();
             }
         }
-        System.out.println(dateFormat.format(new Date()) + " sent PSA to all guilds in default channel with message: \"" + msg + "\"");
-
+        consoleOut("Sent PSA to all activeGuilds in default channel with message: \"" + msg + "\"");
     }
 
-    private static void loadGuildProfiles(){
-        if(!new File(GUILD_PROFILES_PATH).exists()){
+    private static void loadGuildProfiles() {
+        if (!new File(GUILD_PROFILES_PATH).exists()) {
             File guildProfiles = new File(GUILD_PROFILES_PATH);
-            boolean temp = guildProfiles.mkdir();
-            if(temp){
+            if (guildProfiles.mkdir()) {
                 System.out.println("INFO: Created guild-profiles directory at " + guildProfiles.getPath());
             } else {
                 System.err.println("ERROR: Could not create guild-profiles directory");
+                return;
             }
         }
 
@@ -234,11 +235,10 @@ public class Main {
         } catch (InterruptedException e){
             e.printStackTrace();
         }*/
-        for(Guild guild : jda.getGuilds()){
-            if(!new File(GUILD_PROFILES_PATH + "/" + guild.getId()).exists()){
+        for (Guild guild : jda.getGuilds()) {
+            if (!new File(GUILD_PROFILES_PATH + "/" + guild.getId()).exists()) {
                 File guildProfile = new File(GUILD_PROFILES_PATH + "/" + guild.getId());
-                boolean temp = guildProfile.mkdir();
-                if(temp){
+                if (guildProfile.mkdir()) {
                     System.out.println("INFO: Created guild profile for guild: \"" + guild.getName() + "\" at " + guildProfile.getPath());
                 } else {
                     System.err.println("ERROR: Could not create guild profile for guild: \"" + guild.getName() + "\"");
@@ -247,9 +247,76 @@ public class Main {
         }
     }
 
-    static boolean checkMessageValidity(String str){
-        for(char c : str.toCharArray()){
-            if(c != ' '){
+    static void updateGuildList() {
+        if (activeGuilds.isEmpty()) {
+            for (Guild guild : jda.getGuilds()) {
+                activeGuilds.add(new BotGuild(guild));
+            }
+        }
+        for (Guild guild : jda.getGuilds()) {
+            boolean hasBotGuild = false;
+            for (BotGuild botGuild : activeGuilds) {
+                if (botGuild.guild.equals(guild)) {
+                    hasBotGuild = true;
+                    break;
+                }
+            }
+            if (!hasBotGuild) {
+                activeGuilds.add(new BotGuild(guild));
+            }
+        }
+    }
+
+    private static void updateGuildProperties(){
+        for(Guild guild : jda.getGuilds()){
+            updateGuildProperties(guild);
+        }
+    }
+
+    static void updateGuildProperties(Guild guild) {
+        for (BotGuild botGuild : activeGuilds) {
+            if(botGuild.guild.equals(guild)) {
+                File bannedPhrasesProfile = new File(GUILD_PROFILES_PATH + guild.getId() + "/" + "banned-phrases.profile");
+                botGuild.bannedWords.clear();
+                if (!bannedPhrasesProfile.exists()) {
+                    continue;
+                }
+                try {
+                    Scanner s = new Scanner(bannedPhrasesProfile);
+                    while (s.hasNextLine()) {
+                        String line = s.nextLine();
+                        botGuild.bannedWords.add(line);
+                    }
+                    s.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.err.println("ERROR: Failed to update guild property");
+                }
+            }
+        }
+    }
+
+    static BotGuild getBotGuild(Guild guild) {
+        for (BotGuild botGuild : activeGuilds) {
+            if (botGuild.guild.equals(guild)) {
+                return botGuild;
+            }
+        }
+        return null;
+    }
+
+    static File getGuildProfile(Guild guild){
+        return new File(EXE_PATH + "/" + GUILD_PROFILES_PATH + guild.getId());
+    }
+
+    static File getGuildBannedPhrasesProfile(Guild guild){
+        return new File(getGuildProfile(guild) + "/banned-phrases.profile");
+    }
+
+    static boolean checkMessageValidity(String str) {
+
+        for (char c : str.toCharArray()) {
+            if (c != ' ') {
                 return true;
             }
         }

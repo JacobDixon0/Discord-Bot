@@ -7,6 +7,7 @@
 
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -22,6 +23,11 @@ public class EventHandler extends ListenerAdapter {
     static String SK_MEMBER_ROLE_ID     = "534076042613358603";
     static String SK_WELCOME_CHANNEL_ID = "534107890752159747";
     static String SK_WELCOME_MESSAGE_ID = "534774710995779604";
+
+    @Override
+    public void onGuildJoin(GuildJoinEvent event){
+        Main.updateGuildList();
+    }
 
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
