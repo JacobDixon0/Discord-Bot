@@ -18,6 +18,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 class Commands {
 
@@ -206,21 +207,49 @@ class Commands {
         RevokeBanCommand() {
             this.name = "unban";
             this.aliases = new String[]{"revokeban", "removeban", "uban", "ub"};
-            this.help = "ban a user";
+            this.help = "unban a user";
             Main.commands.add(this);
         }
 
         @Override
         protected void execute(CommandEvent event) {
 
-            User author = event.getAuthor();
-            Member member = event.getMember();
             Guild guild = event.getGuild();
-            List<User> mentionedUsers = event.getMessage().getMentionedUsers();
-            List<Member> mentionedMembers = event.getMessage().getMentionedMembers();
-            User mentionedUser;
-            Member mentionedMember;
             GuildController gc = guild.getController();
+
+            if (!event.getMember().hasPermission(Permission.BAN_MEMBERS)) {
+                event.reply("Invalid Permissions");
+                return;
+            }
+
+            if (event.getArgs().isEmpty()) {
+                event.reply(event.getAuthor().getAsMention() + " No user specified.");
+                return;
+            }
+
+            event.getGuild().getBanList().queue(bans -> {
+
+                List<User> userMatches = bans.stream().filter(ban -> isBanned(ban, event.getArgs())).map(Guild.Ban::getUser).collect(Collectors.toList());
+                if(userMatches.isEmpty()){
+                    event.reply("User is not banned.");
+                    return;
+                }
+
+                User bannedUser = userMatches.get(0);
+                String moderator = String.format("%#s", event.getAuthor());
+                String bannedUserAsString = String.format("%#s", bannedUser);
+
+                gc.unban(bannedUser).reason("Unbanned without reason given, contact " + moderator + " for more information.").queue();
+
+                event.reply("Unbanned User: " + bannedUserAsString);
+
+            });
+
+        }
+
+        static boolean isBanned(Guild.Ban ban, String user) {
+
+            return ban.getUser().getName().equalsIgnoreCase(user) || ban.getUser().getId().equals(user) || String.format("%#s", ban.getUser()).equalsIgnoreCase(user);
 
         }
     }
@@ -326,6 +355,33 @@ class Commands {
             eb.addField("Guild Bans", bannedWordsListDisplay0, false);
             eb.addField("Default Bans", bannedWordsListDisplay1, false);
             event.reply(eb.build());
+        }
+    }
+
+    public static class BannedPhrasesClear extends Command {
+
+        BannedPhrasesClear() {
+            this.name = "clearbannedphrases";
+            this.aliases = new String[]{"cbp", "bpc", "bannedphrasesclear", "clearbannedwords", "bannedwordsclear"};
+            this.help = "[RESERVED - Admin] - Removes all banned phrases.";
+        }
+
+        @Override
+        protected void execute(CommandEvent event) {
+
+            if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+                event.reply(event.getAuthor().getAsMention() + ", This command requires administrator permissions.");
+                return;
+            }
+
+            int status = WordFilter.clearBannedPhrases(event.getGuild());
+            if (status == 0) {
+                event.reply("Cleared all banned phrases.");
+            } else if (status == 1) {
+                event.reply("An internal error occurred while attempting to add banned phrase, if this problem persists, please contact the bot administrator.");
+            } else if (status == 2) {
+                event.reply("There are no banned phrases for this guild.");
+            }
         }
     }
 

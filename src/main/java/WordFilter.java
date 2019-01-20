@@ -175,4 +175,23 @@ public class WordFilter extends ListenerAdapter {
         return 0;
     }
 
+    static int clearBannedPhrases(Guild guild){
+
+        File profile = Main.getGuildBannedPhrasesProfile(guild);
+
+        System.out.println(profile.getPath());
+
+        if(profile.exists()){
+            if(profile.delete()){
+                Main.updateGuildProperties(guild);
+                return 0;
+            } else {
+                return 1;
+            }
+        } else {
+            return 2;
+        }
+
+    }
+
 }

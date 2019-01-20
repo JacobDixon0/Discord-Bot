@@ -12,6 +12,7 @@ import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class EventHandler extends ListenerAdapter {
@@ -58,11 +59,61 @@ public class EventHandler extends ListenerAdapter {
     @Override
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
 
+        // SK
         if (event.getMessageId().equals(SK_WELCOME_MESSAGE_ID) && event.getReactionEmote().getName().equals("\u2705" /* ✅ */)) {
             if (event.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
                 event.getGuild().getController().addSingleRoleToMember(event.getGuild().getMemberById(event.getUser().getId()), event.getGuild().getRoleById(SK_MEMBER_ROLE_ID)).queue();
-                event.getGuild().getTextChannelById(SK_ROLE_CHANNEL_ID).sendMessage("Welcome to the server " + event.getMember().getAsMention() + "!").queue();
+                event.getMember().getUser().openPrivateChannel().queue(privateChannel -> {
+                    privateChannel.sendMessage("**Welcome to the server!**").queue();
+                });
             }
         }
+
+        if (event.getMessageId().equals("536618491151908875") && event.getReactionEmote().getName().equals("\u2705" /* ✅ */)){
+            event.getGuild().getController().addSingleRoleToMember(event.getGuild().getMemberById(event.getUser().getId()), event.getGuild().getRoleById("534099092779958293")).queue(success ->{
+                event.getMember().getUser().openPrivateChannel().queue(privateChannel -> {
+                    privateChannel.sendMessage("Assigned Role: " + event.getGuild().getRoleById("534099092779958293").getName()).queue();
+                });
+            });
+        } else if (event.getMessageId().equals("536618511045230605") && event.getReactionEmote().getName().equals("\u2705" /* ✅ */)){
+            event.getGuild().getController().addSingleRoleToMember(event.getGuild().getMemberById(event.getUser().getId()), event.getGuild().getRoleById("534409645566066699")).queue(success ->{
+                event.getMember().getUser().openPrivateChannel().queue(privateChannel -> {
+                    privateChannel.sendMessage("Assigned Role: " + event.getGuild().getRoleById("534409645566066699").getName()).queue();
+                });
+            });
+        } else if (event.getMessageId().equals("536618538245554211") && event.getReactionEmote().getName().equals("\u2705" /* ✅ */)){
+            event.getGuild().getController().addSingleRoleToMember(event.getGuild().getMemberById(event.getUser().getId()), event.getGuild().getRoleById("534084013715881994")).queue(success ->{
+                event.getMember().getUser().openPrivateChannel().queue(privateChannel -> {
+                    privateChannel.sendMessage("Assigned Role: " + event.getGuild().getRoleById("534084013715881994").getName()).queue();
+                });
+            });
+        }
+
     }
+
+    @Override
+    public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event){
+
+        // SK
+        if (event.getMessageId().equals("536618491151908875") && event.getReactionEmote().getName().equals("\u2705" /* ✅ */)){
+            event.getGuild().getController().removeSingleRoleFromMember(event.getGuild().getMemberById(event.getUser().getId()), event.getGuild().getRoleById("534099092779958293")).queue(success ->{
+                event.getMember().getUser().openPrivateChannel().queue(privateChannel -> {
+                    privateChannel.sendMessage("Removed Role: " + event.getGuild().getRoleById("534099092779958293").getName()).queue();
+                });
+            });
+        } else if (event.getMessageId().equals("536618511045230605") && event.getReactionEmote().getName().equals("\u2705" /* ✅ */)){
+            event.getGuild().getController().removeSingleRoleFromMember(event.getGuild().getMemberById(event.getUser().getId()), event.getGuild().getRoleById("534409645566066699")).queue(success ->{
+                event.getMember().getUser().openPrivateChannel().queue(privateChannel -> {
+                    privateChannel.sendMessage("Removed Role: " + event.getGuild().getRoleById("534409645566066699").getName()).queue();
+                });
+            });
+        } else if (event.getMessageId().equals("536618538245554211") && event.getReactionEmote().getName().equals("\u2705" /* ✅ */)){
+            event.getGuild().getController().removeSingleRoleFromMember(event.getGuild().getMemberById(event.getUser().getId()), event.getGuild().getRoleById("534084013715881994")).queue(success ->{
+                event.getMember().getUser().openPrivateChannel().queue(privateChannel -> {
+                    privateChannel.sendMessage("Removed Role: " + event.getGuild().getRoleById("534084013715881994").getName()).queue();
+                });
+            });
+        }
+    }
+
 }

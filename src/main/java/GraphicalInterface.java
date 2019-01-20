@@ -53,7 +53,7 @@ public class GraphicalInterface extends Application {
         tf.setMinWidth(180);
         tf.setLayoutX(10);
         tf.setLayoutY(10);
-        tf.setPromptText("Send message to all activeGuilds");
+        tf.setPromptText("Send message to all guilds");
 
         Button btn = new Button("send");
         btn.setLayoutX(10);

@@ -22,7 +22,7 @@ public class Main {
 
     static final String EXE_PATH = System.getProperty("user.dir");
     static final String GUILD_PROFILES_PATH = EXE_PATH + "/guild-profiles/";
-    static final String VERSION = "0.8a";
+    static final String VERSION = "0.9a";
     static final String ID = "433070903614636032";
     static final String ADMIN_ID = "282331714603450368";
     private static String token;
@@ -86,7 +86,7 @@ public class Main {
                 new Commands.RevokeBanCommand(), new Commands.AdminCommand(),
                 new Commands.AssignRole(), new Commands.ListRoles(),
                 new Commands.BannedPhrasesAdd(), new Commands.BannedPhrasesRemove(),
-                new Commands.BannedPhrasesList()
+                new Commands.BannedPhrasesList(), new Commands.BannedPhrasesClear()
         );
 
         /*jda = new JDABuilder(AccountType.BOT).setToken(token).addEventListener(new EventHandler(), commandClientBuilder.build(), new WordFilter()).buildAsync();*/
@@ -102,7 +102,12 @@ public class Main {
         updateGuildList();
         updateGuildProperties();
 
-        if (!headless) GraphicalInterface.initialize(args);
+        if (!headless) {
+            System.out.println("INFO: Running in window mode");
+            GraphicalInterface.initialize(args);
+        } else {
+            System.out.println("INFO: Running in headless mode");
+        }
     }
 
     static void terminalInput() {
@@ -143,6 +148,8 @@ public class Main {
     static void restartJDA() {
         jda.shutdown();
         loadConfig();
+        loadGuildProfiles();
+        updateGuildProperties();
 
         try {
             Thread.sleep(2000);
@@ -304,8 +311,8 @@ public class Main {
         return null;
     }
 
-    static File getGuildProfile(Guild guild) {
-        return new File(EXE_PATH + "/" + GUILD_PROFILES_PATH + guild.getId());
+    private static File getGuildProfile(Guild guild) {
+        return new File(GUILD_PROFILES_PATH + guild.getId());
     }
 
     static File getGuildBannedPhrasesProfile(Guild guild) {
@@ -313,7 +320,9 @@ public class Main {
     }
 
     static boolean checkMessageValidity(String str) {
-
+        if (str == null) {
+            return false;
+        }
         for (char c : str.toCharArray()) {
             if (c != ' ') {
                 return true;
