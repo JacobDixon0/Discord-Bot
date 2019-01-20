@@ -3,9 +3,9 @@ import net.dv8tion.jda.core.entities.Guild;
 import java.util.ArrayList;
 import java.util.List;
 
-class BotGuild{
+class BotGuild {
 
-    BotGuild(Guild guild){
+    BotGuild(Guild guild) {
         this.guild = guild;
     }
 

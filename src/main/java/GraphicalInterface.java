@@ -218,13 +218,13 @@ public class GraphicalInterface extends Application {
         root.getChildren().addAll(btn0, btn1, r0);
 
         for (TextChannel channel : guild.getTextChannels()) {
-            if(channel.getName().length() > longestServerName){
+            if (channel.getName().length() > longestServerName) {
                 longestServerName = channel.getName().length();
             }
             Text txt = new Text(channel.getName());
             txt.setX(20);
             txt.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 16px;");
-            if(channel.canTalk()) {
+            if (channel.canTalk()) {
                 txt.setFill(Color.WHITE);
                 txt.setOnMouseEntered(e -> txt.setFill(Color.GREY));
                 txt.setOnMouseExited(e -> txt.setFill(Color.WHITE));
@@ -245,7 +245,7 @@ public class GraphicalInterface extends Application {
         return scene;
     }
 
-    private static Scene serverMembersPopup(Stage popupStage, Scene prevScene, Guild guild){
+    private static Scene serverMembersPopup(Stage popupStage, Scene prevScene, Guild guild) {
 
         Pane root = new Pane();
         VBox memberList = new VBox();
@@ -263,7 +263,7 @@ public class GraphicalInterface extends Application {
 
         root.getChildren().add(backButton(10, 10, popupStage, prevScene));
 
-        for(Member m : guild.getMembers()){
+        for (Member m : guild.getMembers()) {
             Text txt = new Text(m.getEffectiveName());
             txt.setFill(Color.WHITE);
             txt.setStyle("-fx-font-size: 16px;");
@@ -296,14 +296,14 @@ public class GraphicalInterface extends Application {
         btnBack.setLayoutY(40);
         btnBack.setLayoutX(10);
         btnBack.setOnAction(e ->
-            stage.setScene(prevScene)
+                stage.setScene(prevScene)
         );
 
         scene.setOnKeyPressed(e -> {
-            if(e.getCode() == KeyCode.ENTER){
-                if(channel.canTalk()) {
-                    if(Main.checkMessageValidity(tf.getText())) {
-                        if(channel.canTalk()) {
+            if (e.getCode() == KeyCode.ENTER) {
+                if (channel.canTalk()) {
+                    if (Main.checkMessageValidity(tf.getText())) {
+                        if (channel.canTalk()) {
                             channel.sendMessage(tf.getText()).queue();
                         } else {
                             System.err.println("ERROR: Could not send message - Invalid Permissions");
@@ -327,7 +327,7 @@ public class GraphicalInterface extends Application {
         return scene;
     }
 
-    private static Scene memberSelectedPopup(Stage popupStage, Scene prevScene, Member member){
+    private static Scene memberSelectedPopup(Stage popupStage, Scene prevScene, Member member) {
 
         Pane root = new Pane();
         Scene scene = new Scene(root, 200, 100);
@@ -341,7 +341,7 @@ public class GraphicalInterface extends Application {
         btn0.setLayoutY(50);
         btn0.setId("stop-button");
         btn0.setOnAction(e -> {
-            if(member.getGuild().getSelfMember().canInteract(member)) {
+            if (member.getGuild().getSelfMember().canInteract(member)) {
                 member.getGuild().getController().ban(member, 0).queue();
             } else {
                 System.err.println("ERROR: Could not ban member: " + member.getEffectiveName());
@@ -357,7 +357,7 @@ public class GraphicalInterface extends Application {
         return scene;
     }
 
-    private static Button backButton(int x, int y, Stage stage, Scene prevScene){
+    private static Button backButton(int x, int y, Stage stage, Scene prevScene) {
         Button btn = new Button("Back");
         btn.setLayoutX(x);
         btn.setLayoutY(y);

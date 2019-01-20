@@ -17,15 +17,15 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 public class EventHandler extends ListenerAdapter {
 
     // SK
-    static String SK_GUILD_ID           = "534074960617144350";
-    static String SK_RULES_CHANNEL_ID   = "534078439716552726";
-    static String SK_ROLE_CHANNEL_ID    = "534113401958301727";
-    static String SK_MEMBER_ROLE_ID     = "534076042613358603";
+    static String SK_GUILD_ID = "534074960617144350";
+    static String SK_RULES_CHANNEL_ID = "534078439716552726";
+    static String SK_ROLE_CHANNEL_ID = "534113401958301727";
+    static String SK_MEMBER_ROLE_ID = "534076042613358603";
     static String SK_WELCOME_CHANNEL_ID = "534107890752159747";
     static String SK_WELCOME_MESSAGE_ID = "534774710995779604";
 
     @Override
-    public void onGuildJoin(GuildJoinEvent event){
+    public void onGuildJoin(GuildJoinEvent event) {
         Main.updateGuildList();
     }
 

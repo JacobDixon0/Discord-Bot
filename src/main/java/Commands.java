@@ -304,7 +304,7 @@ class Commands {
                 return;
             }
 
-            if(Main.getBotGuild(event.getGuild()).bannedWords.isEmpty()){
+            if (Main.getBotGuild(event.getGuild()).bannedWords.isEmpty()) {
                 event.reply("There are no banned phrases for this guild.");
                 return;
             }

@@ -267,15 +267,15 @@ public class Main {
         }
     }
 
-    private static void updateGuildProperties(){
-        for(Guild guild : jda.getGuilds()){
+    private static void updateGuildProperties() {
+        for (Guild guild : jda.getGuilds()) {
             updateGuildProperties(guild);
         }
     }
 
     static void updateGuildProperties(Guild guild) {
         for (BotGuild botGuild : activeGuilds) {
-            if(botGuild.guild.equals(guild)) {
+            if (botGuild.guild.equals(guild)) {
                 File bannedPhrasesProfile = new File(GUILD_PROFILES_PATH + guild.getId() + "/" + "banned-phrases.profile");
                 botGuild.bannedWords.clear();
                 if (!bannedPhrasesProfile.exists()) {
@@ -305,11 +305,11 @@ public class Main {
         return null;
     }
 
-    static File getGuildProfile(Guild guild){
+    static File getGuildProfile(Guild guild) {
         return new File(EXE_PATH + "/" + GUILD_PROFILES_PATH + guild.getId());
     }
 
-    static File getGuildBannedPhrasesProfile(Guild guild){
+    static File getGuildBannedPhrasesProfile(Guild guild) {
         return new File(getGuildProfile(guild) + "/banned-phrases.profile");
     }
 

@@ -8,7 +8,7 @@
 // i dont know how to do multithreading
 public class Knitting extends Thread {
 
-    public void run(){
+    public void run() {
         setName("terminal");
         Main.terminalInput();
     }

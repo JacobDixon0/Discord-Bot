@@ -27,7 +27,7 @@ public class WordFilter extends ListenerAdapter {
 
         String msg = event.getMessage().getContentRaw().toLowerCase();
 
-        if(!event.getGuild().getSelfMember().canInteract(event.getMember())){
+        if (!event.getGuild().getSelfMember().canInteract(event.getMember())) {
             return;
         }
 
@@ -54,15 +54,15 @@ public class WordFilter extends ListenerAdapter {
 
         }
 
-        for(BotGuild botGuild : Main.activeGuilds){
-            for(String string : botGuild.bannedWords){
+        for (BotGuild botGuild : Main.activeGuilds) {
+            for (String string : botGuild.bannedWords) {
                 System.out.println(botGuild.guild.getName() + " : " + string);
             }
         }
 
         if (Main.getBotGuild(event.getGuild()) != null) {
             for (String string : Main.getBotGuild(event.getGuild()).bannedWords) {
-                if (event.getMessage().getContentRaw().equals(string)){
+                if (event.getMessage().getContentRaw().equals(string)) {
                     event.getMessage().delete().queue(done -> {
                         event.getChannel().sendMessage(event.getMember().getAsMention() + ", Your message was deleted because it contains one or more restricted words").queue();
                     });
@@ -150,7 +150,7 @@ public class WordFilter extends ListenerAdapter {
             }
             scanner.close();
 
-            if(!foundWord){
+            if (!foundWord) {
                 return 2;
             }
 
