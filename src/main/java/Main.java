@@ -102,8 +102,7 @@ public class Main {
         updateGuildList();
         updateGuildProperties();
 
-        if (headless) GraphicalInterface.initialize(args);
-
+        if (!headless) GraphicalInterface.initialize(args);
     }
 
     static void terminalInput() {
@@ -173,7 +172,7 @@ public class Main {
                 Matcher m4 = Pattern.compile("^default-timeout-duration: (\\d+)$").matcher(line);
 
                 if (m0.find()) {
-                    headless = m0.group(1).equals("0");
+                    headless = m0.group(1).equals("1");
                 } else if (m1.find()) {
                     hostName = m1.group(1);
                 } else if (m2.find()) {
